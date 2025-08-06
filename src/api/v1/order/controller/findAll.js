@@ -1,0 +1,154 @@
+const Order = require("../../../../models/Orders.model/Orders.model");
+const ApiError = require("../../../../utils/ApiError");
+const ApiResponse = require("../../../../utils/ApiResponse");
+const asyncHandler = require("../../../../utils/asyncHandler");
+
+const findOrderController = asyncHandler(async (req, res) => {
+  const userId = req.user.userId;
+
+  const orders = await Order.aggregate([
+    {
+      $match: { user: userId },
+    },
+    // Lookup to get user info
+    {
+      $lookup: {
+        from: "users", // Collection name
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+    // Lookup to get shipping address
+    {
+      $lookup: {
+        from: "addresses", // Collection name
+        localField: "shippingAddressId",
+        foreignField: "_id",
+        as: "shippingAddress",
+      },
+    },
+    {
+      $unwind: {
+        path: "$shippingAddress",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    // Lookup to get products inside items
+    {
+      $lookup: {
+        from: "products",
+        localField: "items.product",
+        foreignField: "_id",
+        as: "products",
+      },
+    },
+    // Replace product refs inside `items` with actual products
+    {
+      $addFields: {
+        items: {
+          $map: {
+            input: "$items",
+            as: "item",
+            in: {
+              $mergeObjects: [
+                "$$item",
+                {
+                  product: {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$products",
+                          as: "prod",
+                          cond: { $eq: ["$$prod._id", "$$item.product"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+    // Remove the temporary `products` array
+    {
+      $project: {
+        products: 0,
+      },
+    },
+  ]);
+
+  if (!orders.length) {
+    throw new ApiError(404, "Orders not found for this user");
+  }
+
+  const host = req.apiHost;
+
+  const links = {
+    create: {
+      href: `${host}/orders`,
+      method: "POST",
+    },
+    userOrders: {
+      href: `${host}/users/profile/orders`,
+      method: "GET",
+    },
+  };
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { orders, links }, "Orders fetched successfully")
+    );
+});
+
+module.exports = findOrderController;
+
+// const Order = require("../../../../models/Orders.model/Orders.model");
+// const ApiError = require("../../../../utils/ApiError");
+// const ApiResponse = require("../../../../utils/ApiResponse");
+// const asyncHandler = require("../../../../utils/asyncHandler");
+
+// const findOrderController = asyncHandler(async (req, res) => {
+//   // Get userId from request
+//   const userId = req.user.userId;
+
+//   // Find the cart using userId
+//   const orders = await Order.find({ user: userId })
+//     .populate({ path: "items", populate: "product" })
+//     .populate("user")
+//     .populate("shippingAddressId");
+//   // Assuming product details are populated
+
+//   // Check if cart exists and throw an error if not
+//   if (!orders.length) {
+//     throw new ApiError(404, "Orders not found for this user");
+//   }
+
+//   const host = req.apiHost;
+
+//   const links = {
+//     create: {
+//       href: `${host}/orders`,
+//       method: "POST",
+//     },
+//     userOrders: {
+//       href: `${host}/users/profile/orders`,
+//       method: "GET",
+//     },
+//   };
+//   // Return the cart to the user (including populated product details)
+//   return res
+//     .status(200)
+//     .json(
+//       new ApiResponse(200, { orders, links }, "Orders fetched successfully")
+//     );
+// });
+
+// module.exports = findOrderController;
