@@ -1,192 +1,224 @@
-# 1. Authentication & User Management
+# Multi-Vendor E-Commerce API
 
-- POST /api/register — Register a new user ✅
-- POST /api/verify-email — Verify email ✅
-- GET /api/apple — Apple OAuth ✅
-- GET /api/apple/callback — Apple OAuth callback ✅
+A powerful and scalable RESTful API built with Node.js and Express for managing a multi-vendor e-commerce platform. It includes authentication (with support for Google, Facebook, and Apple OAuth), product and order management, cart, checkout, reviews, and more.
 
-- GET /api/google — Google OAuth ✅
-- GET /api/google/callback — Google OAuth callback ✅
+## 🚀 Features
 
-- GET /api/facebook — Facebook OAuth ✅
-- GET /api/facebook/callback — Facebook OAuth callback ✅
+- User, Seller, and Admin authentication with JWT
+- Social login (Google, Facebook, Apple)
+- Password reset, email verification
+- Product, category, and brand management
+- Shopping cart and wishlist
+- Checkout flow and order tracking
+- Review and rating system
+- Cloudinary integration for media uploads
+- Full multi-vendor support (buyers & sellers)
+- Admin panel-ready endpoints
 
-- POST /api/login — User login ✅
+---
 
-- POST /api/logout — User logout ✅
+## 🧰 Tech Stack
 
-- POST /api/forgot-password — Initiate password reset ✅
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB, Mongoose
+- **Authentication:** JWT, OAuth 2.0
+- **Email:** Nodemailer, Gmail SMTP
+- **File Uploads:** Cloudinary
+- **Session & Cookies:** express-session
 
-- PUT /api/user — Update user profile ✅
+---
 
-- POST /api/password/reset — Reset password ✅
+## 🛠️ Getting Started
 
-- POST /api/password/forgot — Initiate password reset ✅
+### 1. Clone the Repository
 
-# 2. Product Management
+```bash
+git clone https://github.com/muhammadranju/multi-vendor-ecommerce-api.git
+cd multi-vendor-ecommerce-api
+```
 
-- POST /api/product — Create a new product ✅
+### 2. Install Dependencies
 
-- GET /api/product — Get all products ✅
+```bash
+npm install
+```
 
-- GET /api/product/:id — Get a specific product by ID ✅
+### 3. Configure Environment Variables
 
-- PUT /api/product/:id — Update a product by ID ✅
+Copy the demo environment config:
 
-- DELETE /api/product/:id — Delete a product by ID ✅
+```bash
+cp demo.config.env .env
+```
 
-- POST /api/product/search — Search for products ✅
+Then update `.env` with your actual credentials (DB, OAuth, email, Cloudinary, etc.).
 
-- POST /api/product/filter — Filter products ✅
+### 4. Start the Development Server
 
-# 3. Order Management
+```bash
+npm run dev
+```
 
-- POST /api/order — Create a new order
+---
 
-- GET /api/order — Get all orders
+## 📚 API Reference
 
-- GET /api/order/:id — Get a specific order by ID
+Base URL: `http://localhost:3000/api/v1`
 
-- PUT /api/order/:id — Update an order by ID
+### 🔐 Auth & User Management
 
-- DELETE /api/order/:id — Delete an order by ID
+- `POST /auth/register` - Register a new user
+- `POST /auth/login` - Login and receive access/refresh tokens
+- `POST /auth/forgot-password` - Send reset email
+- `POST /auth/reset-password` - Reset user password
+- `GET /auth/google` - Google OAuth login
+- `GET /auth/facebook` - Facebook OAuth login
+- `GET /auth/apple` - Apple OAuth login
+- `POST /auth/logout` - Logout and invalidate token
+- `GET /auth/me` - Get authenticated user details
+- `PATCH /auth/profile` - Update user profile
 
-- POST /api/order/search — Search for orders
+### 📦 Products
 
-- POST /api/order/filter — Filter orders
+- `GET /products` - List all products
+- `GET /products/:id` - Get a product by ID
+- `POST /products` - Create product _(seller only)_
+- `PATCH /products/:id` - Update product _(seller only)_
+- `DELETE /products/:id` - Delete product _(seller only)_
 
-# 4. Shopping Cart Management
+### 🛒 Cart
 
-- POST /api/cart — Create a new cart
+- `POST /cart` - Add product to cart
+- `GET /cart` - View current user’s cart
+- `PATCH /cart/:itemId` - Update quantity
+- `DELETE /cart/:itemId` - Remove from cart
 
-- GET /api/cart — Get all carts
+### ❤️ Wishlist
 
-- GET /api/cart/:id — Get a specific cart by ID
+- `POST /wishlist` - Add to wishlist
+- `GET /wishlist` - View wishlist
+- `DELETE /wishlist/:productId` - Remove product
 
-- PUT /api/cart/:id — Update a cart by ID
+### 🧾 Orders
 
-- DELETE /api/cart/:id — Delete a cart by ID
+- `POST /orders` - Place an order
+- `GET /orders` - View order history
+- `GET /orders/:orderId` - Get single order details
+- `PATCH /orders/:orderId/status` - Update order status _(admin/seller)_
 
-- POST /api/cart/search — Search for carts
+### 🧾 Checkout & Payments
 
-- POST /api/cart/filter — Filter carts
+- `POST /checkout` - Begin checkout
+- `POST /payment` - Process payment _(integration-ready)_
 
-# 5.Wishlist Management
+### 🗃️ Categories & Brands
 
-- POST /api/wishlist — Create a new wishlist ✅
+- `GET /categories`
+- `POST /categories` _(admin only)_
+- `GET /brands`
+- `POST /brands` _(admin only)_
 
-- GET /api/wishlist — Get all wishlists ✅
+### 📝 Reviews
 
-- DELETE /api/wishlist/:id — Delete a wishlist by ID ✅
+- `POST /reviews` - Add product review
+- `GET /reviews/:productId` - Fetch product reviews
 
-# 7. Cart Management
+---
 
-- POST /api/cart — Create a new cart ✅
-- GET /api/cart — Get all carts ✅
-- GET /api/cart/:id — Get a specific cart by ID ✅
-- PUT /api/cart/:id — Update a cart by ID ✅
-- DELETE /api/cart/:id — Delete a cart by ID ✅
+## 🌍 Environment Variables
 
-# 8. Checkout Management
+Below are required in the `.env` file:
 
-- POST /api/checkout — Create a new checkout
+```env
+PORT=3000
+NODE_ENV=development
+MONGODB_URI_LOCAL=mongodb://127.0.0.1:27017
 
-- GET /api/checkout — Get all checkouts
+FRONTEND_URL=http://localhost:5173
 
-- GET /api/checkout/:id — Get a specific checkout by ID
+# Google OAuth
+GOOGLE_CLIENT_ID=***
+GOOGLE_CLIENT_SECRET=***
+GOOGLE_CALLBACK_URL=http://localhost:3000/api/v1/auth/google/callback
 
-- PUT /api/checkout/:id — Update a checkout by ID
+# Facebook OAuth
+FACEBOOK_APP_ID=***
+FACEBOOK_APP_SECRET=***
+FACEBOOK_CALLBACK_URL=http://localhost:3000/api/v1/auth/facebook/callback
 
-- DELETE /api/checkout/:id — Delete a checkout by ID
+# Apple OAuth
+APPLE_SERVICE_ID=***
+APPLE_TEAM_ID=***
+APPLE_KEY_ID=***
+APPLE_PRIVATE_KEY_PATH=***
+APPLE_CALLBACK_URL=http://localhost:3000/api/v1/auth/apple/callback
 
-# 9. Payment Management
+# JWT Secrets
+ACCESS_TOKEN_SECRET=***
+ACCESS_TOKEN_EXPIRY=1d
+REFRESH_TOKEN_SECRET=***
+REFRESH_TOKEN_EXPIRY=30d
 
-- POST /api/payment — Create a new payment
+SELLER_ACCESS_TOKEN_SECRET=***
+SELLER_ACCESS_TOKEN_EXPIRY=1d
+SELLER_REFRESH_TOKEN_SECRET=***
+SELLER_REFRESH_TOKEN_EXPIRY=30d
 
-- GET /api/payment — Get all payments
+ADMIN_ACCESS_TOKEN_SECRET=***
+ADMIN_ACCESS_TOKEN_EXPIRY=1d
+ADMIN_REFRESH_TOKEN_SECRET=***
+ADMIN_REFRESH_TOKEN_EXPIRY=30d
 
-- GET /api/payment/:id — Get a specific payment by ID
+# Admin Credentials
+SUPER_ADMIN_EMAIL=***
+SUPER_ADMIN_PASSWORD=***
 
-- PUT /api/payment/:id — Update a payment by ID
+# Cookies & Session
+COOKIE_SECRET_KEY=***
+SESSION_SECRET=***
 
-- DELETE /api/payment/:id — Delete a payment by ID
+# Gmail SMTP
+EMAIL=***
+EMAIL_PASSKEY=***
+EMAIL_SERVICE=***
+EMAIL_PORT=***
+EMAIL_USERNAME=***
+EMAIL_PASSWORD=***
 
-# 10. Address Management
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=***
+CLOUDINARY_API_KEY=***
+CLOUDINARY_API_SECRET=***
+```
 
-- POST /api/address — Create a new address ✅
+---
 
-- GET /api/address — Get all addresses ✅
+## 🧪 Testing
 
-- GET /api/address/:id — Get a specific address by ID ✅
+To run the test suite (if implemented):
 
-- PUT /api/address/:id — Update a address by ID ✅
+```bash
+npm test
+```
 
-- DELETE /api/address/:id — Delete a address by ID ✅
+---
 
-# 11. Category Management
+## 🤝 Contributing
 
-- POST /api/category — Create a new category ✅
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Open a pull request
 
-- GET /api/category — Get all categories ✅
+---
 
-- GET /api/category/:id — Get a specific category by ID ✅
+## 📄 License
 
-- PUT /api/category/:id — Update a category by ID ✅
+MIT License © 2025 [Muhammad Ranju](https://github.com/muhammadranju)
 
-- DELETE /api/category/:id — Delete a category by ID ✅
+---
 
-- POST /api/category/search — Search for categories ✅
+## 📫 Contact
 
-- POST /api/category/filter — Filter categories ✅
-
-# 12. Brand Management
-
-- POST /api/brand — Create a new brand ✅
-
-- GET /api/brand — Get all brands ✅
-
-- GET /api/brand/:id — Get a specific brand by ID ✅
-
-- PUT /api/brand/:id — Update a brand by ID ✅
-
-- DELETE /api/brand/:id — Delete a brand by ID ✅
-
-- POST /api/brand/search — Search for brands ✅
-
-- POST /api/brand/filter — Filter brands ✅
-
-# 13. Review Management
-
-- POST /api/review — Create a new review
-
-- GET /api/review — Get all reviews
-
-- GET /api/review/:id — Get a specific review by ID
-
-- PUT /api/review/:id — Update a review by ID
-
-- DELETE /api/review/:id — Delete a review by ID
-
-# 14. Account Management
-
-- POST /api/account — Create a new account
-
-- GET /api/account — Get all accounts
-
-- GET /api/account/:id — Get a specific account by ID
-
-- PUT /api/account/:id — Update a account by ID
-
-- DELETE /api/account/:id — Delete a account by ID
-
-# 15. Order Item Management
-
-- POST /api/orderitem — Create a new orderitem
-
-- GET /api/orderitem — Get all orderitems
-
-- GET /api/orderitem/:id — Get a specific orderitem by ID
-
-- PUT /api/orderitem/:id — Update a orderitem by ID
-
-- DELETE /api/orderitem/:id — Delete a orderitem by ID
+For inquiries or support, please contact \[[mdranju23@gmail.com](mailto:mdranju23@gmail.com)]
