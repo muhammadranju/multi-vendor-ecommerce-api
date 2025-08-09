@@ -4,12 +4,14 @@ const http = require("http");
 const databaseConnection = require("./db/databaseConnection");
 const config = require("./config/config");
 const ApiError = require("./utils/ApiError");
+const { connectRedis } = require("./config/redis.config");
 
 const PORT = config.PORT || 3030;
 const server = http.createServer(app);
 
 const startServer = async () => {
   try {
+    await connectRedis()
     // Connect to the database
     await databaseConnection();
 
